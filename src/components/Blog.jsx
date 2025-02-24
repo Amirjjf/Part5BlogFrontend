@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';  // ✅ Import PropTypes
 
 const Blog = ({ blog, likeBlog, deleteBlog, user }) => {
   const [visible, setVisible] = useState(false);
@@ -33,6 +34,25 @@ const Blog = ({ blog, likeBlog, deleteBlog, user }) => {
       )}
     </div>
   );
+};
+
+// ✅ Define PropTypes
+Blog.propTypes = {
+  blog: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    author: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    likes: PropTypes.number.isRequired,
+    user: PropTypes.shape({
+      username: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired
+    })
+  }).isRequired,
+  likeBlog: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    username: PropTypes.string.isRequired
+  }).isRequired
 };
 
 export default Blog;
