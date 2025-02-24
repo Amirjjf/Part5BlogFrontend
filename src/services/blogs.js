@@ -20,10 +20,17 @@ const create = async (newObject) => {
   return response.data;
 };
 
-// ✅ New: Update likes using PUT request
 const update = async (id, updatedObject) => {
   const response = await axios.put(`${baseUrl}/${id}`, updatedObject);
   return response.data;
 };
 
-export default { getAll, create, update, setToken };
+// ✅ New: Delete blog using DELETE request
+const remove = async (id) => {
+  const config = {
+    headers: { Authorization: token },
+  };
+  await axios.delete(`${baseUrl}/${id}`, config);
+};
+
+export default { getAll, create, update, remove, setToken };

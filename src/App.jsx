@@ -74,12 +74,25 @@ const App = () => {
       const updatedBlog = {
         ...blog,
         likes: blog.likes + 1,
-        user: blog.user.id || blog.user // Ensure user ID is sent
+        user: blog.user.id || blog.user
       };
       const returnedBlog = await blogService.update(blog.id, updatedBlog);
       setBlogs(blogs.map(b => b.id === blog.id ? returnedBlog : b));
     } catch (error) {
       showNotification('Failed to update likes', 'error');
+    }
+  };
+
+  // ✅ Handle Blog Deletion
+  const deleteBlog = async (blog) => {
+    if (window.confirm(`Are you sure you want to delete "${blog.title}"?`)) {
+      try {
+        await blogService.remove(blog.id);
+        setBlogs(blogs.filter(b => b.id !== blog.id));
+        showNotification(`Deleted "${blog.title}"`, 'success');
+      } catch (error) {
+        showNotification('Failed to delete blog', 'error');
+      }
     }
   };
 
@@ -106,12 +119,17 @@ const App = () => {
         <BlogForm createBlog={addBlog} onCancel={() => blogFormRef.current.toggleVisibility()} />
       </Togglable>
 
-      {/* ✅ Sort blogs by likes in descending order */}
       {blogs
-        .slice() // Use slice to avoid mutating the original array
-        .sort((a, b) => b.likes - a.likes) // Sort in descending order
+        .slice()
+        .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
-          <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
+          <Blog
+            key={blog.id}
+            blog={blog}
+            likeBlog={likeBlog}
+            deleteBlog={deleteBlog}
+            user={user}
+          />
         ))}
     </div>
   );
