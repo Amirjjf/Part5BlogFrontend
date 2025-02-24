@@ -5,14 +5,14 @@ import loginService from './services/login';
 import LoginForm from './components/LoginForm';
 import BlogForm from './components/BlogForm';
 import Notification from './components/Notification';
-import Togglable from './components/Togglable'; // ✅ Import Togglable
+import Togglable from './components/Togglable';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const [notification, setNotification] = useState(null);
 
-  const blogFormRef = useRef(); // ✅ Reference to control Togglable component
+  const blogFormRef = useRef();
 
   // ✅ Check Local Storage on Component Mount
   useEffect(() => {
@@ -62,9 +62,24 @@ const App = () => {
       setBlogs(blogs.concat(returnedBlog));
       showNotification(`Added "${returnedBlog.title}" by ${returnedBlog.author}`, 'success');
 
-      blogFormRef.current.toggleVisibility(); // ✅ Hide form after success
+      blogFormRef.current.toggleVisibility();
     } catch (error) {
       showNotification('Failed to add blog', 'error');
+    }
+  };
+
+  // ✅ Handle Blog Like
+  const likeBlog = async (blog) => {
+    try {
+      const updatedBlog = {
+        ...blog,
+        likes: blog.likes + 1,
+        user: blog.user.id || blog.user // Ensure user ID is sent
+      };
+      const returnedBlog = await blogService.update(blog.id, updatedBlog);
+      setBlogs(blogs.map(b => b.id === blog.id ? returnedBlog : b));
+    } catch (error) {
+      showNotification('Failed to update likes', 'error');
     }
   };
 
@@ -91,9 +106,13 @@ const App = () => {
         <BlogForm createBlog={addBlog} onCancel={() => blogFormRef.current.toggleVisibility()} />
       </Togglable>
 
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
+      {/* ✅ Sort blogs by likes in descending order */}
+      {blogs
+        .slice() // Use slice to avoid mutating the original array
+        .sort((a, b) => b.likes - a.likes) // Sort in descending order
+        .map((blog) => (
+          <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
+        ))}
     </div>
   );
 };
