@@ -16,7 +16,7 @@ describe('<Blog />', () => {
     user: { username: 'dan', name: 'Dan Abramov' }
   };
 
-  const mockLikeBlog = jest.fn();
+  const mockLikeBlog = jest.fn(); // ✅ Mock function
   const mockDeleteBlog = jest.fn();
 
   beforeEach(() => {
@@ -39,7 +39,7 @@ describe('<Blog />', () => {
 
   test('renders URL and likes when the "View" button is clicked', () => {
     const button = screen.getByText('View');
-    fireEvent.click(button); // ✅ Use fireEvent to simulate click
+    fireEvent.click(button);
 
     const urlElement = component.container.querySelector('.blog-url');
     const likesElement = component.container.querySelector('.blog-likes');
@@ -48,12 +48,23 @@ describe('<Blog />', () => {
     expect(likesElement).toHaveTextContent('Likes: 10');
   });
 
-  // ✅ New test for Step 2: Verify URL and likes are displayed when "View" is clicked
   test('URL and likes are displayed when "View" button is clicked', () => {
     const button = screen.getByText('View');
     fireEvent.click(button);
 
     expect(screen.getByText('URL: https://reactjs.org')).toBeVisible();
     expect(screen.getByText('Likes: 10')).toBeVisible();
+  });
+
+  // ✅ New Test: Ensure "Like" button calls event handler twice when clicked twice
+  test('calls the like button event handler twice when clicked twice', () => {
+    const viewButton = screen.getByText('View');
+    fireEvent.click(viewButton); // Open blog details
+
+    const likeButton = screen.getByText('Like');
+    fireEvent.click(likeButton); // First click
+    fireEvent.click(likeButton); // Second click
+
+    expect(mockLikeBlog).toHaveBeenCalledTimes(2); // ✅ Ensure called twice
   });
 });
